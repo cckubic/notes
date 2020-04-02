@@ -1,52 +1,59 @@
-// index.js
-// This is the main entry point of our application
-
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client';
-import GlobalStyle from '/components/GlobalStyles';
-import Pages from '/pages';
+import {
+  ApolloClient,
+  ApolloProvider,
+  createHttpLink
+} from '@apollo/client';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+
 import { setContext } from 'apollo-link-context';
 
+// import global styles
+import GlobalStyle from '/components/GlobalStyles';
+// import our routes
+import Pages from '/pages';
+
+// configure our API URI & cache
 const uri = process.env.API_URI;
 const httpLink = createHttpLink({ uri });
 const cache = new InMemoryCache();
 
+// return the headers to the context
 const authLink = setContext((_, { headers }) => {
-    return {
+  return {
     headers: {
-    ...headers,
-    authorization: localStorage.getItem('token') || ''
+      ...headers,
+      authorization: localStorage.getItem('token') || ''
     }
-    };
-    });
+  };
+});
 
-// configure Apollo Client
+// create the Apollo client
 const client = new ApolloClient({
-    link: authLink.concat(httpLink),
-    cache,
-    resolvers: {},
-    connectToDevTools: true
-    });
+  link: authLink.concat(httpLink),
+  cache,
+  resolvers: {},
+  connectToDevTools: true
+});
 
 // check for a local token
 const data = {
-    isLoggedIn: !!localStorage.getItem('token')
-    };
-    // write the cache data on initial load
-    cache.writeData({ data });
-    // write the cache data after cache is reset
-    client.onResetStore(() => cache.writeData({ data }));
+  isLoggedIn: !!localStorage.getItem('token')
+};
+
+// write the cache data on initial load
+cache.writeData({ data });
+// write the cache data after cache is reset
+client.onResetStore(() => cache.writeData({ data }));
 
 const App = () => {
-return (
-<div>
-<ApolloProvider client={client}>
-    <GlobalStyle />
-<Pages />
-</ApolloProvider>
-</div>
-);
+  return (
+    <ApolloProvider client={client}>
+      <GlobalStyle />
+      <Pages />
+    </ApolloProvider>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));

@@ -8,8 +8,6 @@ import NoteUser from './NoteUser';
 // import the IS_LOGGED_IN local query
 import { IS_LOGGED_IN } from '../gql/query';
 
-// update the date markup to format it as Month, Day, and Year
-{format(note.createdAt, 'MMM Do YYYY')} Favorites:{' '}
 const StyledNote = styled.article`
 max-width: 800px;
 margin: 0 auto;
